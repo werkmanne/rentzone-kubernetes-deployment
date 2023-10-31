@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: nestapp-deployment
+  labels:
+    app: nestapp-dynamic-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nestapp-dynamic-app
+  template:  
+    metadata:
+      labels: 
+        app: nestapp-dynamic-app
+    spec:
+      initContainers:
+        - name: init-db
+          image: busybox:1.31
+          command: ['sh', '-c', 'echo -e "Checking for the availability of MySQL Server deployment"; while ! nc -z mysql 3306; do sleep 1; printf "-"; done; echo -e "  >> MySQL DB Server has started";']      
+      containers:
+        - name: nestapp-dynamic-app-image
+          image: belloafeez/nest-app:latest
+          ports: 
+            - containerPort: 80            
+          env:
+            - name: PERSONAL_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-personal-token
+                  key: personal-token-access   
+            - name: GITHUB_USERNAME
+              value: "werkmanne"
+            - name: REPOSITORY_NAME
+              value: "nest-app-code"
+            - name: WEB_FILE_UNZIP
+              value: "nest-app-code"
+            - name: DOMAIN_NAME
+              value: "www.belloafeez.com"
+            - name: RDS_ENDPOINT
+              value: "applicationdb.clltdecxyfzo.us-east-1.rds.amazonaws.com"                              
+            - name: RDS_DB_NAME
+              value: "demodb"            
+            - name: RDS_MASTER_USERNAME
+              value: "bello"        # RDS DB Username is dbadmin     
+            - name: RDS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-db-password
+                  key: db-password           
+          livenessProbe:
+            exec:
+              command: 
+                - /bin/sh
+                - -c 
+                - nc -z localhost 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /nestapp-dynamic-app/health-status
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10          
