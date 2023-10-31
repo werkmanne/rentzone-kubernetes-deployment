@@ -1,0 +1,44 @@
+# Create Cluster
+
+eksctl create cluster --name nestapp-EKS-demo --region us-east-1 --zones us-east-1a,us-east-1b --without-nodegroup
+
+# Create & Associate IAM OIDC Provider for our EKS Cluster
+
+eksctl utils associate-iam-oidc-provider --region us-east-1 --cluster nestapp-EKS-demo --approve
+
+# Create EC2 Keypair
+
+keypair = nestapp-EKS-demo
+
+# Create Node Group with additional Add-Ons in Public Subnets
+
+eksctl create nodegroup --cluster=nestapp-EKS-demo `
+                        --region=us-east-1 `
+                        --name=nestapp-eks-public-subnet `
+                        --node-type=t3.medium `
+                        --nodes=2 `
+                        --nodes-min=2 `
+                        --nodes-max=4 `
+                        --node-volume-size=20 `
+                        --ssh-access `
+                        --ssh-public-key=Nestapp-EKS-keypair `
+                        --managed `
+                        --asg-access `
+                        --external-dns-access `
+                        --full-ecr-access `
+                        --appmesh-access `
+                        --alb-ingress-access
+
+
+eksctl delete nodegroup --nestapp-EKS-demo --name=nestapp-eks-public-subnet
+
+
+----- For testing purpose
+
+Allow traffic from anywhere on (sg-04cb3f975bc00b78b - eksctl-nestapp-EKS-demo-nodegroup-nestapp-eks-public-subnet-remoteAccess)
+
+Create MySQL SVC
+
+kubectl apply -f kube-manifests/01-Nestapp-MySQL-externalName-Service.yml
+
+
