@@ -1,2 +1,5 @@
-build_image.sh
 nest-app.env
+build-image.sh
+rentzone_deployment.sh
+secret_provider_class.yaml
+deployments.yaml
