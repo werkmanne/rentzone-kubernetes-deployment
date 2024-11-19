@@ -6,3 +6,4 @@ deployments.yaml
 kube-manifests
 nest-app.env
 migrate.sh
+commmand.txt
