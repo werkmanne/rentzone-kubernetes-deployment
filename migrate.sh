@@ -1,10 +1,10 @@
 #!/bin/bash
 
 S3_URI=s3://demo-rentzone/V1__rentzone-db.sql
-RDS_ENDPOINT=applicationdb.chucqcesil3r.eu-central-1.rds.amazonaws.com
-RDS_DB_NAME=demodb
-RDS_DB_USERNAME=bello
-RDS_DB_PASSWORD=Icui4cyou
+RDS_ENDPOINT=******
+RDS_DB_NAME=*****
+RDS_DB_USERNAME=*****
+RDS_DB_PASSWORD=*****
 
 # Update all packages
 sudo yum update -y
